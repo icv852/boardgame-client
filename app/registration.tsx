@@ -2,15 +2,16 @@ import { useEffect, useState } from "react";
 import { StyleSheet } from "react-native"; 
 import { Input, View, Text } from "@ant-design/react-native"
 import { colors } from '@/constants/colors';
-
 import CenteredView from "@/components/CenteredView";
 import ArrowBtn from "@/components/ArrowBtn"
 import { checkUsername, register } from "@/api/auth";
 import { usePathname } from "expo-router";
+import { saveToken } from "@/utils/secure-store";
 
 enum Stage {
     ONE = 1,
-    TWO = 2
+    TWO = 2,
+    DONE = 3,
 }
 
 export default function RegistrationPage() {
@@ -21,10 +22,24 @@ export default function RegistrationPage() {
     const [password, setPassword] = useState<string>("")
     const [error, setError] = useState<string | null>(null)
 
-    async function handleStageOne(username: string) {
+    async function handleStageOne() {
         try {
             await checkUsername({ username })
             setStage(Stage.TWO)            
+        } catch (e: unknown) {
+            if (e instanceof Error) {
+                setError(e.message)
+            } else {
+                setError(`An unexpected error occurred. Please try again later.`)
+            }
+        }
+    }
+
+    async function handleStageTwo() {
+        try {
+            const { token } = await register({ username, password })
+            await saveToken(token)
+            // TODO: redirecting to dashboard
         } catch (e: unknown) {
             if (e instanceof Error) {
                 setError(e.message)
@@ -52,7 +67,7 @@ export default function RegistrationPage() {
                     {error && <Text style={styles.error}>{error}</Text>}
                     <View style={{ width: "100%", display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
                         <ArrowBtn direction="left" href="/" />
-                        <ArrowBtn direction="right" onPress={async () => await handleStageOne(username)} />
+                        <ArrowBtn direction="right" onPress={handleStageOne} />
                     </View>
                 </View>    
             )}
@@ -66,9 +81,10 @@ export default function RegistrationPage() {
                         placeholder="Password"
                         onChangeText={setPassword}
                     />
+                    {error && <Text style={styles.error}>{error}</Text>}
                     <View style={{ width: "100%", display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
                         <ArrowBtn direction="left" onPress={() => setStage(Stage.ONE)} />
-                        {/* <ArrowBtn direction="right" onPress={handleRegister} /> */}
+                        <ArrowBtn direction="right" onPress={handleStageTwo} />
                     </View>
                 </View>    
             )}
