@@ -1,12 +1,13 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { StyleSheet } from "react-native"; 
 import { Input, View, Text } from "@ant-design/react-native"
 import { colors } from '@/constants/colors';
 import CenteredView from "@/components/CenteredView";
 import ArrowBtn from "@/components/ArrowBtn"
 import { checkUsername, register } from "@/api/auth";
-import { usePathname } from "expo-router";
+import { usePathname, useRouter } from "expo-router";
 import { saveToken } from "@/utils/secure-store";
+import { AuthContext } from "@/components/AuthContext";
 
 enum Stage {
     ONE = 1,
@@ -16,6 +17,8 @@ enum Stage {
 
 export default function RegistrationPage() {
     const pathname = usePathname()
+    const router = useRouter()
+    const { setToken } = useContext(AuthContext)
 
     const [stage, setStage] = useState<Stage>(Stage.ONE)
     const [username, setUsername] = useState<string>("")
@@ -38,8 +41,9 @@ export default function RegistrationPage() {
     async function handleStageTwo() {
         try {
             const { token } = await register({ username, password })
+            setToken(token)
             await saveToken(token)
-            // TODO: redirecting to dashboard
+            router.replace("/dashboard")
         } catch (e: unknown) {
             if (e instanceof Error) {
                 setError(e.message)
@@ -74,7 +78,7 @@ export default function RegistrationPage() {
             {stage === Stage.TWO && (
                 <View style={{ width: "80%" }}>
                     <Text style={styles.title}>Choose a password</Text>
-                    <Text style={styles.subtitle}>Make sure it's at least 8 characters long.</Text>
+                    <Text style={styles.subtitle}>Make sure it's at least 6 characters long.</Text>
                     <Input
                         style={styles.inputBox}
                         value={password}

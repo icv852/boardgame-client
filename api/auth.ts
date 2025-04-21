@@ -1,6 +1,6 @@
 import { HttpMethod, sendRequest } from "@/utils/http"
 
-const LOCAL_API_BASE_URL = "http://119.236.56.239:4000"
+const LOCAL_API_BASE_URL = "http://localhost:4000"
 
 export const checkUsername = async (data: { username: string }): Promise<void> => await sendRequest(HttpMethod.POST, `${LOCAL_API_BASE_URL}/auth/v1/check-username`, data)
 
