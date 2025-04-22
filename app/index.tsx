@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { StyleSheet } from "react-native"; 
 import { Input, View, Text } from "@ant-design/react-native"
 import { colors } from '@/constants/colors';
@@ -11,7 +11,7 @@ import { saveToken } from "@/utils/secure-store";
 
 export default function Index() {
   const router = useRouter()
-  const { setToken } = useContext(AuthContext)
+  const { setToken, token } = useContext(AuthContext)
 
   const [username, setUsername] = useState<string>("")
   const [password, setPassword] = useState<string>("")
@@ -32,6 +32,11 @@ export default function Index() {
           }
       }
   }
+
+  useEffect(() => {
+    if (!token) return
+    router.replace("/dashboard")
+  }, [token])
   
   return (
     <CenteredView>

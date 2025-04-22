@@ -18,7 +18,7 @@ enum Stage {
 export default function RegistrationPage() {
     const pathname = usePathname()
     const router = useRouter()
-    const { setToken } = useContext(AuthContext)
+    const { setToken, token } = useContext(AuthContext)
 
     const [stage, setStage] = useState<Stage>(Stage.ONE)
     const [username, setUsername] = useState<string>("")
@@ -56,6 +56,11 @@ export default function RegistrationPage() {
     useEffect(() => {
         setError(null)
     }, [stage, pathname])
+
+    useEffect(() => {
+        if (!token) return
+        router.replace("/dashboard")
+    }, [token])
 
     return (
         <CenteredView>
