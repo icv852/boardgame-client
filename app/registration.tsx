@@ -5,7 +5,7 @@ import { colors } from '@/constants/colors';
 import CenteredView from "@/components/CenteredView";
 import ArrowBtn from "@/components/ArrowBtn"
 import { checkUsername, register } from "@/api/auth";
-import { usePathname, useRouter } from "expo-router";
+import { usePathname, useRouter, Link } from "expo-router";
 import { saveToken } from "@/utils/secure-store";
 import { AuthContext } from "@/components/AuthContext";
 
@@ -70,7 +70,7 @@ export default function RegistrationPage() {
                     />
                     {error && <Text style={styles.error}>{error}</Text>}
                     <View style={{ width: "100%", display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
-                        <ArrowBtn direction="left" href="/" />
+                        <View />
                         <ArrowBtn direction="right" onPress={handleStageOne} />
                     </View>
                 </View>    
@@ -84,6 +84,7 @@ export default function RegistrationPage() {
                         value={password}
                         placeholder="Password"
                         onChangeText={setPassword}
+                        type="password"
                     />
                     {error && <Text style={styles.error}>{error}</Text>}
                     <View style={{ width: "100%", display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
@@ -92,6 +93,9 @@ export default function RegistrationPage() {
                     </View>
                 </View>    
             )}
+            <View style ={{ marginTop: 50, alignItems: "center" }}>
+                <Link href="/" style={{ color: colors.blue }}>Already have an account? Sign up</Link>
+            </View>
         </CenteredView>
     )
 }
