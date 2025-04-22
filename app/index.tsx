@@ -1,16 +1,37 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { StyleSheet } from "react-native"; 
 import { Input, View, Text } from "@ant-design/react-native"
 import { colors } from '@/constants/colors';
 import CenteredView from "@/components/CenteredView";
 import ArrowBtn from "@/components/ArrowBtn"
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
+import { login } from "@/api/auth";
+import { AuthContext } from "@/components/AuthContext";
+import { saveToken } from "@/utils/secure-store";
 
 export default function Index() {
+  const router = useRouter()
+  const { setToken } = useContext(AuthContext)
 
   const [username, setUsername] = useState<string>("")
   const [password, setPassword] = useState<string>("")
   const [error, setError] = useState<string | null>(null)
+
+  async function handleLogin() {
+      try {
+        const { token } = await login({ username, password })
+        setToken(token)
+        await saveToken(token)
+        router.replace("/dashboard")
+      } catch (e: unknown) {
+          if (e instanceof Error) {
+              console.error(e)
+              setError(e.message)
+          } else {
+              setError(`An unexpected error occurred. Please try again later.`)
+          }
+      }
+  }
   
   return (
     <CenteredView>
@@ -32,7 +53,7 @@ export default function Index() {
         {error && <Text style={styles.error}>{error}</Text>}
         <View style={{ width: "100%", display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
             <View />
-            <ArrowBtn direction="right" href="/" />
+            <ArrowBtn direction="right" onPress={handleLogin} />
         </View>
       </View>    
 
